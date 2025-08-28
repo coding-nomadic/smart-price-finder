@@ -14,10 +14,10 @@
 
         header {
             background: #1f1f1f;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
             color: #00bcd4;
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
         }
 
@@ -44,35 +44,39 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
             width: 100%;
         }
 
         input[type="text"] {
-            width: 60%;
-            min-width: 250px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 1rem;
+            width: 70%;
+            min-width: 300px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2rem;
             border: none;
+        }
+
+        input[type="text"]::placeholder {
+            font-size: 1.2rem;
         }
 
         .row {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
             justify-content: center;
-            width: 60%;
-            min-width: 250px;
+            width: 70%;
+            min-width: 300px;
         }
 
         select, button {
-            flex: 1 1 100px;
-            min-width: 80px;
-            padding: 8px;
-            border-radius: 6px;
+            flex: 1 1 120px;
+            min-width: 100px;
+            padding: 12px;
+            border-radius: 8px;
             border: none;
-            font-size: 1rem;
+            font-size: 1.2rem;
         }
 
         select {
@@ -96,30 +100,31 @@
         .store-card {
             background: #1e1e1e;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 20px;
+            gap: 25px;
         }
 
         .left-info {
             flex: 2;
+            font-size: 1.1rem;
         }
 
         .right-info {
             flex: 1;
             text-align: right;
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 600;
         }
 
-        .right-info .price { color: #2e7d32; font-size: 1.2rem; font-weight: bold; }
+        .right-info .price { color: #2e7d32; font-size: 1.5rem; font-weight: bold; }
         .right-info .discount { color: #ff6f00; }
         .right-info .rating { color: #fbc02d; }
 
@@ -130,23 +135,25 @@
         .error {
             background: #f44336;
             color: white;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             margin-bottom: 20px;
             text-align: center;
+            font-size: 1.2rem;
         }
 
         /* Toast */
         #toast {
             display:none;
             margin:10px auto;
-            padding:15px 20px;
+            padding:18px 25px;
             background:#ff9800;
             color:#fff;
-            border-radius:8px;
+            border-radius:10px;
             text-align:center;
-            max-width:400px;
+            max-width:450px;
             font-weight:bold;
+            font-size: 1.2rem;
             box-shadow:0 2px 6px rgba(0,0,0,0.5);
             opacity:0;
             transition: opacity 0.5s;
@@ -175,10 +182,13 @@
         }
         .side-nav ul li a:hover { background-color: #333; border-radius: 4px; }
 
+        /* Mobile responsiveness */
         @media (max-width:768px){
             input[type="text"], .row { width: 90%; }
+            input[type="text"], select, button { font-size: 1.3rem; padding: 14px; }
+            .card-header { flex-direction: column; gap: 15px; }
+            .right-info { text-align: left; }
         }
-
     </style>
 </head>
 <body>
@@ -197,7 +207,7 @@
 <div class="container">
     <!-- Search Form -->
     <div class="container" th:class="${#lists.isEmpty(stores)} ? 'form-center' : 'form-top'">
-    <form action="/generate" method="post">
+        <form action="/generate" method="post">
 
             <!-- Product search input -->
             <input type="text" name="query" placeholder="Search for a product..." required>
@@ -263,7 +273,6 @@
         </div>
     </div>
 </div>
-
 <script>
     const provinceCities = {
         "AB": ["Calgary", "Edmonton", "Red Deer", "Lethbridge", "Fort McMurray", "Medicine Hat", "Grande Prairie"],
@@ -294,21 +303,6 @@
             citySelect.appendChild(option);
         });
     });
-
-    // Toast display
-    /*[[${noData}]]*/
-    document.addEventListener("DOMContentLoaded", function(){
-        if(/*[[${noData}]]*/ false){
-            const toast = document.getElementById('toast');
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.opacity = 1; }, 100);
-            setTimeout(() => {
-                toast.style.opacity = 0;
-                setTimeout(() => { toast.style.display = 'none'; }, 500);
-            }, 5000);
-        }
-    });
 </script>
-
 </body>
 </html>
