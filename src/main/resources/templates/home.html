@@ -5,127 +5,148 @@
     <title>Smart Price Finder</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
             background: #121212;
-            color: #f5f5f5;
+            color: #ffffff;
             margin: 0;
             padding: 0;
-        }
-
-        header {
-            background: #1f1f1f;
-            padding: 25px;
-            text-align: center;
-            color: #00bcd4;
-            font-size: 2.5rem;
-            font-weight: bold;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .container {
-            max-width: 1000px;
+            width: 100%;
+            max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-        }
-
-        /* Form styles */
-        .form-center {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 50vh;
             flex-direction: column;
+            align-items: center;
+            flex: 1;
         }
 
-        .form-top {
-            margin-bottom: 30px;
+        /* Vertically center form even when stores exist */
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            gap: 15px;
+            min-height: 50vh;
+        }
+
+        /* Title above form */
+        .form-title {
+            font-size: 2rem;
+            font-weight: 500;
+            color: #4da6ff;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
         form {
+            width: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 20px;
+            gap: 15px;
+        }
+
+        input[type="text"], select {
             width: 100%;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            border-radius: 24px;
+            border: 1px solid #ccc;
+            background: #1f1f1f;
+            color: #fff;
+            transition: 0.3s;
         }
 
-        input[type="text"] {
-            width: 70%;
-            min-width: 300px;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 1.2rem;
-            border: none;
-        }
-
-        input[type="text"]::placeholder {
-            font-size: 1.2rem;
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #4da6ff;
+            box-shadow: 0 0 8px rgba(77, 166, 255, 0.5);
         }
 
         .row {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
             justify-content: center;
-            width: 70%;
-            min-width: 300px;
         }
 
         select, button {
             flex: 1 1 120px;
             min-width: 100px;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 24px;
             border: none;
-            font-size: 1.2rem;
-        }
-
-        select {
-            background: #1f1f1f;
-            color: #f5f5f5;
+            font-size: 0.95rem;
         }
 
         button {
-            background: #00bcd4;
+            background: #4da6ff;
             color: #fff;
-            font-weight: bold;
+            font-weight: 500;
             cursor: pointer;
             transition: 0.3s;
         }
 
         button:hover {
-            background: #0097a7;
+            background: #3399ff;
         }
 
-        /* Store Cards */
+        .results-container {
+    width: 100%;
+    margin-top: 15px; /* smaller gap from form */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* spacing between cards */
+}
+
+@media (max-width: 768px) {
+    .results-container {
+        margin-top: 10px; /* even smaller gap on mobile */
+    }
+}
+
         .store-card {
             background: #1e1e1e;
+            padding: 18px;
             border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .store-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.6);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 25px;
+            gap: 15px;
         }
 
         .left-info {
             flex: 2;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
         }
 
         .right-info {
             flex: 1;
             text-align: right;
-            font-size: 1.3rem;
+            font-size: 1rem;
             font-weight: 600;
         }
 
-        .right-info .price { color: #2e7d32; font-size: 1.5rem; font-weight: bold; }
-        .right-info .discount { color: #ff6f00; }
+        .right-info .price { color: #4da6ff; font-size: 1.2rem; font-weight: bold; }
+        .right-info .discount { color: #ff9800; }
         .right-info .rating { color: #fbc02d; }
 
         .availability.in-stock { color: #4caf50; font-weight: bold; }
@@ -135,25 +156,24 @@
         .error {
             background: #f44336;
             color: white;
-            padding: 12px;
+            padding: 12px 20px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin: 15px 0;
             text-align: center;
-            font-size: 1.2rem;
+            font-weight: bold;
         }
 
-        /* Toast */
         #toast {
             display:none;
             margin:10px auto;
-            padding:18px 25px;
+            padding:16px 22px;
             background:#ff9800;
             color:#fff;
             border-radius:10px;
             text-align:center;
-            max-width:450px;
+            max-width:400px;
             font-weight:bold;
-            font-size: 1.2rem;
+            font-size: 0.95rem;
             box-shadow:0 2px 6px rgba(0,0,0,0.5);
             opacity:0;
             transition: opacity 0.5s;
@@ -177,24 +197,21 @@
         .side-nav ul { list-style: none; padding: 0; margin: 0; }
         .side-nav ul li { display: block; text-align: center; margin: 10px 0; }
         .side-nav ul li a {
-            display: block; color: #00bcd4; padding: 10px; text-decoration: none;
+            display: block; color: #4da6ff; padding: 10px; text-decoration: none;
             font-weight: bold; white-space: nowrap; transition: 0.2s;
         }
         .side-nav ul li a:hover { background-color: #333; border-radius: 4px; }
 
         /* Mobile responsiveness */
         @media (max-width:768px){
-            input[type="text"], .row { width: 90%; }
-            input[type="text"], select, button { font-size: 1.3rem; padding: 14px; }
-            .card-header { flex-direction: column; gap: 15px; }
+            .form-title { font-size: 1.8rem; }
+            input[type="text"], select, button { font-size: 0.95rem; padding: 10px; }
+            .card-header { flex-direction: column; gap: 10px; }
             .right-info { text-align: left; }
         }
     </style>
 </head>
 <body>
-<header>
-    Smart Price Finder
-</header>
 
 <div class="side-nav">
     <ul>
@@ -205,14 +222,10 @@
 </div>
 
 <div class="container">
-    <!-- Search Form -->
-    <div class="container" th:class="${#lists.isEmpty(stores)} ? 'form-center' : 'form-top'">
+    <div class="form-wrapper" th:class="${#lists.isEmpty(stores)} ? 'form-wrapper' : 'form-wrapper'">
+        <div class="form-title">Smart Price Finder</div>
         <form action="/generate" method="post">
-
-            <!-- Product search input -->
             <input type="text" name="query" placeholder="Search for a product..." required>
-
-            <!-- Province, City, Button -->
             <div class="row">
                 <select id="province" name="province" required>
                     <option value="" disabled selected>Province</option>
@@ -230,64 +243,61 @@
                     <option value="NU">Nunavut</option>
                     <option value="YT">Yukon</option>
                 </select>
-
                 <select id="city" name="city" required>
                     <option value="" disabled selected>City</option>
                 </select>
-
                 <button type="submit">Find Prices</button>
             </div>
         </form>
     </div>
 
-    <!-- Error Message -->
     <div th:if="${error}" class="error" th:text="${error}"></div>
-
-    <!-- Toast -->
     <div id="toast">No Product Found in this location, try some other locations!</div>
 
     <!-- Store Results -->
-    <div th:each="store : ${stores}" class="store-card" th:data-availability="${store.availability}">
-        <div class="card-header">
-            <div class="left-info">
-                <h3 th:text="${store.productName}">Product Name</h3>
-                <p><strong>Store:</strong> <span th:text="${store.storeName}">Store Name</span>
-                    (<span th:text="${store.storeType}">Type</span>)</p>
-                <p><strong>Availability:</strong>
-                    <span class="availability"
-                          th:classappend="${store.availability == 'In Stock'} ? ' in-stock' :
-                                          (${store.availability == 'Low Stock'} ? ' low-stock' : ' out-of-stock')"
-                          th:text="${store.availability}">
-                    </span>
-                </p>
-                <p><strong>Distance:</strong> <span th:text="${store.distance}">0</span></p>
-                <p><strong>Address:</strong> <span th:text="${store.location}">Address</span></p>
-                <p><strong>Last Updated:</strong> <span th:text="${store.lastUpdated}">Today</span></p>
-                <p><strong>Website:</strong> <a th:href="${store.website}" target="_blank">Visit Store</a></p>
-            </div>
-            <div class="right-info">
-                <p class="price">💲 $<span th:text="${store.price}">0.00</span></p>
-                <p class="discount">🎯 <span th:text="${store.discount}">0%</span></p>
-                <p class="rating">⭐ <span th:text="${store.rating}">0</span>/5</p>
+    <div class="results-container">
+        <div th:each="store : ${stores}" class="store-card" th:data-availability="${store.availability}">
+            <div class="card-header">
+                <div class="left-info">
+                    <h3 th:text="${store.productName}">Product Name</h3>
+                    <p><strong>Store:</strong> <span th:text="${store.storeName}">Store Name</span> (<span th:text="${store.storeType}">Type</span>)</p>
+                    <p><strong>Availability:</strong>
+                        <span class="availability"
+                              th:classappend="${store.availability == 'In Stock'} ? ' in-stock' :
+                                              (${store.availability == 'Low Stock'} ? ' low-stock' : ' out-of-stock')"
+                              th:text="${store.availability}">
+                        </span>
+                    </p>
+                    <p><strong>Distance:</strong> <span th:text="${store.distance}">0</span></p>
+                    <p><strong>Address:</strong> <span th:text="${store.location}">Address</span></p>
+                    <p><strong>Last Updated:</strong> <span th:text="${store.lastUpdated}">Today</span></p>
+                    <p><strong>Website:</strong> <a th:href="${store.website}" target="_blank">Visit Store</a></p>
+                </div>
+                <div class="right-info">
+                    <p class="price">💲 $<span th:text="${store.price}">0.00</span></p>
+                    <p class="discount">🎯 <span th:text="${store.discount}">0%</span></p>
+                    <p class="rating">⭐ <span th:text="${store.rating}">0</span>/5</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 <script>
     const provinceCities = {
-        "AB": ["Calgary", "Edmonton", "Red Deer", "Lethbridge", "Fort McMurray", "Medicine Hat", "Grande Prairie"],
-        "BC": ["Vancouver", "Victoria", "Kelowna", "Surrey", "Burnaby", "Richmond", "Abbotsford", "Nanaimo"],
-        "MB": ["Winnipeg", "Brandon", "Steinbach", "Thompson", "Portage la Prairie", "Selkirk"],
-        "NB": ["Moncton", "Fredericton", "Saint John", "Dieppe", "Miramichi", "Bathurst"],
-        "NL": ["St. John's", "Mount Pearl", "Corner Brook", "Gander", "Grand Falls-Windsor", "Clarenville"],
-        "NS": ["Halifax", "Sydney", "Dartmouth", "Truro", "New Glasgow", "Glace Bay"],
-        "ON": ["Toronto", "Ottawa", "Hamilton", "London", "Mississauga", "Brampton", "Kitchener", "Windsor", "Thunder Bay"],
-        "PE": ["Charlottetown", "Summerside", "Stratford", "Cornwall", "Montague"],
-        "QC": ["Montreal", "Quebec City", "Laval", "Gatineau", "Longueuil", "Sherbrooke", "Trois-Rivières", "Lévis"],
-        "SK": ["Saskatoon", "Regina", "Prince Albert", "Moose Jaw", "Yorkton", "Swift Current"],
-        "NT": ["Yellowknife", "Hay River", "Fort Smith", "Inuvik"],
-        "NU": ["Iqaluit", "Rankin Inlet", "Arviat", "Cambridge Bay"],
-        "YT": ["Whitehorse", "Dawson City", "Watson Lake"]
+        "AB":["Calgary","Edmonton","Red Deer","Lethbridge","Fort McMurray","Medicine Hat","Grande Prairie"],
+        "BC":["Vancouver","Victoria","Kelowna","Surrey","Burnaby","Richmond","Abbotsford","Nanaimo"],
+        "MB":["Winnipeg","Brandon","Steinbach","Thompson","Portage la Prairie","Selkirk"],
+        "NB":["Moncton","Fredericton","Saint John","Dieppe","Miramichi","Bathurst"],
+        "NL":["St. John's","Mount Pearl","Corner Brook","Gander","Grand Falls-Windsor","Clarenville"],
+        "NS":["Halifax","Sydney","Dartmouth","Truro","New Glasgow","Glace Bay"],
+        "ON":["Toronto","Ottawa","Hamilton","London","Mississauga","Brampton","Kitchener","Windsor","Thunder Bay"],
+        "PE":["Charlottetown","Summerside","Stratford","Cornwall","Montague"],
+        "QC":["Montreal","Quebec City","Laval","Gatineau","Longueuil","Sherbrooke","Trois-Rivières","Lévis"],
+        "SK":["Saskatoon","Regina","Prince Albert","Moose Jaw","Yorkton","Swift Current"],
+        "NT":["Yellowknife","Hay River","Fort Smith","Inuvik"],
+        "NU":["Iqaluit","Rankin Inlet","Arviat","Cambridge Bay"],
+        "YT":["Whitehorse","Dawson City","Watson Lake"]
     };
 
     const provinceSelect = document.getElementById('province');
