@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ public class ProductPriceService {
     /**
      * Fetches product store details from the API using the given prompt.
      */
+    @Cacheable(value = "stores", key = "#prompt")
     public List<ProductPriceDetail> fetchStores(final String prompt) {
         try {
             final String responseBody = sendRequest(prompt);
