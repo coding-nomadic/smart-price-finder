@@ -14,24 +14,24 @@
 
         header {
             background: #1f1f1f;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
             color: #00bcd4;
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: bold;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 700px;
             margin: 50px auto;
-            padding: 20px;
+            padding: 25px;
         }
 
         h2 {
             text-align: center;
             color: #00bcd4;
-            font-size: 2rem;
-            margin-bottom: 25px;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
             border-bottom: 2px solid #00bcd4;
             display: inline-block;
             padding-bottom: 5px;
@@ -40,35 +40,35 @@
         form {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
             background: #1e1e1e;
-            padding: 25px;
+            padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
 
         input, textarea {
-            padding: 12px;
+            padding: 15px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             background: #2a2a2a;
             color: #f5f5f5;
-            font-size: 1rem;
+            font-size: 1.2rem;
             width: 100%;
         }
 
         input:focus, textarea:focus {
-            outline: 2px solid #00bcd4;
+            outline: 3px solid #00bcd4;
         }
 
         button {
-            padding: 12px 20px;
+            padding: 15px 25px;
             border: none;
             background: #00bcd4;
             color: #fff;
-            font-size: 1rem;
+            font-size: 1.3rem;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: 10px;
             transition: 0.3s;
             font-weight: bold;
         }
@@ -110,7 +110,7 @@
         .side-nav ul li a {
             display: block;
             color: #00bcd4;
-            padding: 10px;
+            padding: 12px;
             text-decoration: none;
             font-weight: bold;
             white-space: nowrap;
@@ -122,39 +122,36 @@
             border-radius: 4px;
         }
 
-        footer {
-            text-align: center;
-            padding: 15px;
-            background: #1f1f1f;
-            color: #00bcd4;
-            width: 100%;
-        }
-
         /* Mobile responsiveness */
         @media (max-width: 768px) {
             header {
-                font-size: 1.5rem;
-                padding: 15px;
+                font-size: 1.8rem;
+                padding: 20px;
             }
 
             .container {
                 margin: 20px auto;
-                padding: 15px;
+                padding: 20px;
             }
 
             h2 {
-                font-size: 1.5rem;
-                margin-bottom: 20px;
+                font-size: 2rem;
+                margin-bottom: 25px;
             }
 
             form {
-                padding: 20px;
-                gap: 15px;
+                padding: 25px;
+                gap: 20px;
+            }
+
+            input, textarea {
+                font-size: 1.1rem;
+                padding: 12px;
             }
 
             button {
-                padding: 10px;
-                font-size: 0.95rem;
+                padding: 12px 20px;
+                font-size: 1.1rem;
             }
 
             .side-nav {
@@ -168,10 +165,6 @@
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
-            }
-
-            .side-nav:hover {
-                width: 100%;
             }
 
             .side-nav ul {
@@ -211,7 +204,7 @@
 
         <input type="text" name="name" placeholder="Your Name" required>
         <input type="email" name="email" placeholder="Your Email" required>
-        <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+        <textarea name="message" rows="6" placeholder="Your Message" required></textarea>
 
         <button type="submit">Send Message</button>
     </form>
