@@ -3,50 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <title>Smart Price Finder</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body, html {
-            height: 100%;
-            margin: 0;
+        body {
             font-family: 'Roboto', Arial, sans-serif;
             background: #121212;
             color: #ffffff;
-        }
-
-        .search-container {
-            height: 100vh;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
             flex-direction: column;
+            align-items: center;
         }
 
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        /* Vertically center form even when stores exist */
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            gap: 15px;
+            min-height: 50vh;
+        }
+
+        /* Title above form */
         .form-title {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 500;
             color: #4da6ff;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-align: center;
         }
 
-        input, select, button {
-            border-radius: 24px;
-            background: #1f1f1f;
-            color: #ffffff;
-            border: 1px solid #ccc;
+        form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        input:focus, select:focus {
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            border-radius: 24px;
+            border: 1px solid #ccc;
+            background: #1f1f1f;
+            color: #fff;
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus, select:focus {
             outline: none;
             border-color: #4da6ff;
             box-shadow: 0 0 8px rgba(77, 166, 255, 0.5);
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        select, button {
+            flex: 1 1 120px;
+            min-width: 100px;
+            padding: 10px;
+            border-radius: 24px;
+            border: none;
+            font-size: 0.95rem;
         }
 
         button {
             background: #4da6ff;
             color: #fff;
             font-weight: 500;
+            cursor: pointer;
             transition: 0.3s;
         }
 
@@ -55,8 +100,18 @@
         }
 
         .results-container {
-            margin-top: 30px;
-        }
+    width: 100%;
+    margin-top: 15px; /* smaller gap from form */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* spacing between cards */
+}
+
+@media (max-width: 768px) {
+    .results-container {
+        margin-top: 10px; /* even smaller gap on mobile */
+    }
+}
 
         .store-card {
             background: #1e1e1e;
@@ -70,6 +125,29 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.6);
         }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .left-info {
+            flex: 2;
+            font-size: 0.95rem;
+        }
+
+        .right-info {
+            flex: 1;
+            text-align: right;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .right-info .price { color: #4da6ff; font-size: 1.2rem; font-weight: bold; }
+        .right-info .discount { color: #ff9800; }
+        .right-info .rating { color: #fbc02d; }
 
         .availability.in-stock { color: #4caf50; font-weight: bold; }
         .availability.low-stock { color: #ff9800; font-weight: bold; }
@@ -100,19 +178,56 @@
             opacity:0;
             transition: opacity 0.5s;
         }
+
+        /* Right sliding sidebar */
+        .side-nav {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1f1f1f;
+            border-radius: 8px 0 0 8px;
+            overflow: hidden;
+            transition: width 0.3s;
+            width: 50px;
+            z-index: 1000;
+        }
+
+        .side-nav:hover { width: 150px; }
+        .side-nav ul { list-style: none; padding: 0; margin: 0; }
+        .side-nav ul li { display: block; text-align: center; margin: 10px 0; }
+        .side-nav ul li a {
+            display: block; color: #4da6ff; padding: 10px; text-decoration: none;
+            font-weight: bold; white-space: nowrap; transition: 0.2s;
+        }
+        .side-nav ul li a:hover { background-color: #333; border-radius: 4px; }
+
+        /* Mobile responsiveness */
+        @media (max-width:768px){
+            .form-title { font-size: 1.8rem; }
+            input[type="text"], select, button { font-size: 0.95rem; padding: 10px; }
+            .card-header { flex-direction: column; gap: 10px; }
+            .right-info { text-align: left; }
+        }
     </style>
 </head>
 <body>
 
-<div class="search-container container">
-    <div class="form-title">Smart Price Finder</div>
-    <form action="/generate" method="post" class="w-100" style="max-width:600px;">
-        <div class="mb-3">
-            <input type="text" name="query" class="form-control form-control-lg" placeholder="Search for a product..." required>
-        </div>
-        <div class="row g-2">
-            <div class="col-md">
-                <select id="province" name="province" class="form-select form-select-lg" required>
+<div class="side-nav">
+    <ul>
+        <li><a th:href="@{/}">Home</a></li>
+        <li><a th:href="@{/about}">About</a></li>
+        <li><a th:href="@{/contact}">Contact Us</a></li>
+    </ul>
+</div>
+
+<div class="container">
+    <div class="form-wrapper" th:class="${#lists.isEmpty(stores)} ? 'form-wrapper' : 'form-wrapper'">
+        <div class="form-title">Smart Price Finder</div>
+        <form action="/generate" method="post">
+            <input type="text" name="query" placeholder="Search for a product..." required>
+            <div class="row">
+                <select id="province" name="province" required>
                     <option value="" disabled selected>Province</option>
                     <option value="AB">Alberta</option>
                     <option value="BC">British Columbia</option>
@@ -128,48 +243,46 @@
                     <option value="NU">Nunavut</option>
                     <option value="YT">Yukon</option>
                 </select>
-            </div>
-            <div class="col-md">
-                <select id="city" name="city" class="form-select form-select-lg" required>
+                <select id="city" name="city" required>
                     <option value="" disabled selected>City</option>
                 </select>
+                <button type="submit">Find Prices</button>
             </div>
-            <div class="col-md">
-                <button type="submit" class="btn btn-lg w-100">Find Prices</button>
-            </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 
-<div class="container results-container" th:if="${stores}">
-    <div th:each="store : ${stores}" class="store-card mb-3" th:data-availability="${store.availability}">
-        <div class="d-flex flex-column flex-md-row justify-content-between">
-            <div class="left-info">
-                <h5 th:text="${store.productName}">Product Name</h5>
-                <p><strong>Store:</strong> <span th:text="${store.storeName}">Store Name</span> (<span th:text="${store.storeType}">Type</span>)</p>
-                <p><strong>Availability:</strong>
-                    <span class="availability"
-                          th:classappend="${store.availability == 'In Stock'} ? ' in-stock' :
-                                          (${store.availability == 'Low Stock'} ? ' low-stock' : ' out-of-stock')"
-                          th:text="${store.availability}">
-                    </span>
-                </p>
-                <p><strong>Distance:</strong> <span th:text="${store.distance}">0</span></p>
-                <p><strong>Address:</strong> <span th:text="${store.location}">Address</span></p>
-                <p><strong>Last Updated:</strong> <span th:text="${store.lastUpdated}">Today</span></p>
-                <p><strong>Website:</strong> <a th:href="${store.website}" target="_blank">Visit Store</a></p>
-            </div>
-            <div class="right-info text-md-end mt-3 mt-md-0">
-                <p class="price">💲 $<span th:text="${store.price}">0.00</span></p>
-                <p class="discount">🎯 <span th:text="${store.discount}">0%</span></p>
-                <p class="rating">⭐ <span th:text="${store.rating}">0</span>/5</p>
+    <div th:if="${error}" class="error" th:text="${error}"></div>
+    <div id="toast">No Product Found in this location, try some other locations!</div>
+
+    <!-- Store Results -->
+    <div class="results-container">
+        <div th:each="store : ${stores}" class="store-card" th:data-availability="${store.availability}">
+            <div class="card-header">
+                <div class="left-info">
+                    <h3 th:text="${store.productName}">Product Name</h3>
+                    <p><strong>Store:</strong> <span th:text="${store.storeName}">Store Name</span> (<span th:text="${store.storeType}">Type</span>)</p>
+                    <p><strong>Availability:</strong>
+                        <span class="availability"
+                              th:classappend="${store.availability == 'In Stock'} ? ' in-stock' :
+                                              (${store.availability == 'Low Stock'} ? ' low-stock' : ' out-of-stock')"
+                              th:text="${store.availability}">
+                        </span>
+                    </p>
+                    <p><strong>Distance:</strong> <span th:text="${store.distance}">0</span></p>
+                    <p><strong>Address:</strong> <span th:text="${store.location}">Address</span></p>
+                    <p><strong>Last Updated:</strong> <span th:text="${store.lastUpdated}">Today</span></p>
+                    <p><strong>Website:</strong> <a th:href="${store.website}" target="_blank">Visit Store</a></p>
+                </div>
+                <div class="right-info">
+                    <p class="price">💲 $<span th:text="${store.price}">0.00</span></p>
+                    <p class="discount">🎯 <span th:text="${store.discount}">0%</span></p>
+                    <p class="rating">⭐ <span th:text="${store.rating}">0</span>/5</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const provinceCities = {
         "AB":["Calgary","Edmonton","Red Deer","Lethbridge","Fort McMurray","Medicine Hat","Grande Prairie"],
