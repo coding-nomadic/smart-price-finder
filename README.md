@@ -14,12 +14,6 @@ This is Backend for recipe server built in springboot, JWT Token and email servi
 - Scheduled tasks send email every 14 days to the most liked recipe makers
 - Analytics API covered to show case in UI.
 
-## Microservices - 
-
-- React-UI Service: Front-end client UI which displays data and makes API calls using Axios API.
-- Authentication Service: Creates user account and handles username/password authentication, login/logout.
-- Recipe Service: It allows to create recipes, view, update, comment, ratings etc.
-
 ## Tools and Technologies
 - Java 17
 - Spring Boot
@@ -29,3 +23,6 @@ This is Backend for recipe server built in springboot, JWT Token and email servi
 - Prompt Engieering
 - Docker
 - Render
+
+
+https://smart-price-finder.onrender.com/
