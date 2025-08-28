@@ -9,7 +9,7 @@ COPY pom.xml .
 COPY src ./src
 
 # Build the Spring Boot JAR
-RUN mvn clean package -DskipTests
+RUN mvn clean install -DskipTests
 
 #
 # Package stage
