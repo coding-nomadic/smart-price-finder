@@ -4,7 +4,6 @@ import com.example.product.price.models.ContactForm;
 import com.example.product.price.models.ProductPriceDetail;
 import com.example.product.price.services.EmailService;
 import com.example.product.price.services.ProductPriceService;
-import com.example.product.price.utils.JsonUtils;
 import com.example.product.price.utils.ProductPriceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +39,7 @@ public class ProductPriceController {
             final String prompt = ProductPriceUtils.setPrompt(query, city, province);
             logger.info("Query: " + query + ", Province: " + province + ", City: " + city + "\n" + prompt);
             final List<ProductPriceDetail> stores = productPriceService.fetchStores(prompt);
-            logger.info("Fetched {} stores for query '{}'", stores.size(), JsonUtils.toString(stores));
+            logger.info("Fetched {} stores for query '{}'", stores.size());
             model.addAttribute("query", query);
             model.addAttribute("stores", stores);
             // Add a flag if no stores found
