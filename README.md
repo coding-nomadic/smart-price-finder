@@ -1,18 +1,14 @@
-# Recipe-Sharing-Service
+# Smart Price Finder
 
-This is Backend for recipe server built in springboot, JWT Token and email service. UI is implemented in react JS
+Welcome to Smart Price Finder, your go-to platform for discovering products at nearby stores quickly and easily.
 
 ## Features in this application- 
 
-- JWT token support for quick login.
-- Regular Username/Password authentication.
-- Stores user information in the PostgreSQL database.
-- Email verification to confirm during user registration
-- Create, view, update recipes, 
-- comments, ratings and view ingredients, cuisines
-- Stores API data in Cache to minimize network calls.
-- Scheduled tasks send email every 14 days to the most liked recipe makers
-- Analytics API covered to show case in UI.
+- Find products at nearby stores instantly.
+- Compare prices across multiple retail stores.
+- Get real-time updates on prices, availability, and discounts.
+- Enjoy a Material Design-inspired, user-friendly interface.
+- Access continuous updates with more stores and products.
 
 ## Tools and Technologies
 - Java 17
