@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Smart Price Finder</title>
     <style>
         body {
@@ -22,32 +23,68 @@
 
         .container {
             max-width: 1000px;
-            margin: 30px auto;
+            margin: 0 auto;
             padding: 20px;
+        }
+
+        /* Form styles */
+        .form-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50vh;
+            flex-direction: column;
+        }
+
+        .form-top {
+            margin-bottom: 30px;
         }
 
         form {
             display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
         }
 
         input[type="text"] {
             width: 60%;
+            min-width: 250px;
             padding: 10px;
+            border-radius: 8px;
+            font-size: 1rem;
             border: none;
-            border-radius: 8px 0 0 8px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            width: 60%;
+            min-width: 250px;
+        }
+
+        select, button {
+            flex: 1 1 100px;
+            min-width: 80px;
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
             font-size: 1rem;
         }
 
+        select {
+            background: #1f1f1f;
+            color: #f5f5f5;
+        }
+
         button {
-            padding: 10px 20px;
-            border: none;
             background: #00bcd4;
             color: #fff;
-            font-size: 1rem;
+            font-weight: bold;
             cursor: pointer;
-            border-radius: 0 8px 8px 0;
             transition: 0.3s;
         }
 
@@ -55,6 +92,7 @@
             background: #0097a7;
         }
 
+        /* Store Cards */
         .store-card {
             background: #1e1e1e;
             border-radius: 12px;
@@ -81,19 +119,9 @@
             font-weight: 600;
         }
 
-        .right-info .price {
-            color: #2e7d32;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        .right-info .discount {
-            color: #ff6f00;
-        }
-
-        .right-info .rating {
-            color: #fbc02d;
-        }
+        .right-info .price { color: #2e7d32; font-size: 1.2rem; font-weight: bold; }
+        .right-info .discount { color: #ff6f00; }
+        .right-info .rating { color: #fbc02d; }
 
         .availability.in-stock { color: #4caf50; font-weight: bold; }
         .availability.low-stock { color: #ff9800; font-weight: bold; }
@@ -107,6 +135,23 @@
             margin-bottom: 20px;
             text-align: center;
         }
+
+        /* Toast */
+        #toast {
+            display:none;
+            margin:10px auto;
+            padding:15px 20px;
+            background:#ff9800;
+            color:#fff;
+            border-radius:8px;
+            text-align:center;
+            max-width:400px;
+            font-weight:bold;
+            box-shadow:0 2px 6px rgba(0,0,0,0.5);
+            opacity:0;
+            transition: opacity 0.5s;
+        }
+
         /* Right sliding sidebar */
         .side-nav {
             position: fixed;
@@ -121,35 +166,17 @@
             z-index: 1000;
         }
 
-        .side-nav:hover {
-            width: 150px;
-        }
-
-        .side-nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .side-nav ul li {
-            display: block;
-            text-align: center;
-            margin: 10px 0;
-        }
-
+        .side-nav:hover { width: 150px; }
+        .side-nav ul { list-style: none; padding: 0; margin: 0; }
+        .side-nav ul li { display: block; text-align: center; margin: 10px 0; }
         .side-nav ul li a {
-            display: block;
-            color: #00bcd4;
-            padding: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            white-space: nowrap;
-            transition: 0.2s;
+            display: block; color: #00bcd4; padding: 10px; text-decoration: none;
+            font-weight: bold; white-space: nowrap; transition: 0.2s;
         }
+        .side-nav ul li a:hover { background-color: #333; border-radius: 4px; }
 
-        .side-nav ul li a:hover {
-            background-color: #333;
-            border-radius: 4px;
+        @media (max-width:768px){
+            input[type="text"], .row { width: 90%; }
         }
 
     </style>
@@ -158,6 +185,7 @@
 <header>
     Smart Price Finder
 </header>
+
 <div class="side-nav">
     <ul>
         <li><a th:href="@{/}">Home</a></li>
@@ -165,105 +193,68 @@
         <li><a th:href="@{/contact}">Contact Us</a></li>
     </ul>
 </div>
+
 <div class="container">
     <!-- Search Form -->
-    <form action="/generate" method="post" style="display:flex; gap:10px; justify-content:center; margin-bottom:30px;">
+    <div class="container" th:class="${#lists.isEmpty(stores)} ? 'form-center' : 'form-top'">
+    <form action="/generate" method="post">
 
-        <!-- Product search input -->
-        <input type="text" name="query" placeholder="Search for a product..." required style="padding:10px; border:none; border-radius:8px 0 0 8px; font-size:1rem; flex:2;">
+            <!-- Product search input -->
+            <input type="text" name="query" placeholder="Search for a product..." required>
 
-        <!-- Province dropdown -->
-        <select id="province" name="province" required style="padding:10px; border:none; background:#1f1f1f; color:#f5f5f5; font-size:1rem;">
-            <option value="" disabled selected>Province</option>
-            <option value="AB">Alberta</option>
-            <option value="BC">British Columbia</option>
-            <option value="MB">Manitoba</option>
-            <option value="NB">New Brunswick</option>
-            <option value="NL">Newfoundland and Labrador</option>
-            <option value="NS">Nova Scotia</option>
-            <option value="ON">Ontario</option>
-            <option value="PE">Prince Edward Island</option>
-            <option value="QC">Quebec</option>
-            <option value="SK">Saskatchewan</option>
-            <option value="NT">Northwest Territories</option>
-            <option value="NU">Nunavut</option>
-            <option value="YT">Yukon</option>
-        </select>
+            <!-- Province, City, Button -->
+            <div class="row">
+                <select id="province" name="province" required>
+                    <option value="" disabled selected>Province</option>
+                    <option value="AB">Alberta</option>
+                    <option value="BC">British Columbia</option>
+                    <option value="MB">Manitoba</option>
+                    <option value="NB">New Brunswick</option>
+                    <option value="NL">Newfoundland and Labrador</option>
+                    <option value="NS">Nova Scotia</option>
+                    <option value="ON">Ontario</option>
+                    <option value="PE">Prince Edward Island</option>
+                    <option value="QC">Quebec</option>
+                    <option value="SK">Saskatchewan</option>
+                    <option value="NT">Northwest Territories</option>
+                    <option value="NU">Nunavut</option>
+                    <option value="YT">Yukon</option>
+                </select>
 
-        <!-- City dropdown -->
-        <select id="city" name="city" required style="padding:10px; border:none; background:#1f1f1f; color:#f5f5f5; font-size:1rem;">
-            <option value="" disabled selected>City</option>
-        </select>
+                <select id="city" name="city" required>
+                    <option value="" disabled selected>City</option>
+                </select>
 
-        <!-- Submit button -->
-        <button type="submit" style="padding:10px 20px; border:none; background:#00bcd4; color:#fff; font-size:1rem; border-radius:0 8px 8px 0; cursor:pointer;">Find Prices</button>
-    </form>
-
-    <script>
-        const provinceCities = {
-            "AB": ["Calgary", "Edmonton", "Red Deer", "Lethbridge", "Fort McMurray", "Medicine Hat", "Grande Prairie"],
-            "BC": ["Vancouver", "Victoria", "Kelowna", "Surrey", "Burnaby", "Richmond", "Abbotsford", "Nanaimo"],
-            "MB": ["Winnipeg", "Brandon", "Steinbach", "Thompson", "Portage la Prairie", "Selkirk"],
-            "NB": ["Moncton", "Fredericton", "Saint John", "Dieppe", "Miramichi", "Bathurst"],
-            "NL": ["St. John's", "Mount Pearl", "Corner Brook", "Gander", "Grand Falls-Windsor", "Clarenville"],
-            "NS": ["Halifax", "Sydney", "Dartmouth", "Truro", "New Glasgow", "Glace Bay"],
-            "ON": ["Toronto", "Ottawa", "Hamilton", "London", "Mississauga", "Brampton", "Kitchener", "Windsor", "Thunder Bay"],
-            "PE": ["Charlottetown", "Summerside", "Stratford", "Cornwall", "Montague"],
-            "QC": ["Montreal", "Quebec City", "Laval", "Gatineau", "Longueuil", "Sherbrooke", "Trois-Rivières", "Lévis"],
-            "SK": ["Saskatoon", "Regina", "Prince Albert", "Moose Jaw", "Yorkton", "Swift Current"],
-            "NT": ["Yellowknife", "Hay River", "Fort Smith", "Inuvik"],
-            "NU": ["Iqaluit", "Rankin Inlet", "Arviat", "Cambridge Bay"],
-            "YT": ["Whitehorse", "Dawson City", "Watson Lake"]
-        };
-
-        const provinceSelect = document.getElementById('province');
-        const citySelect = document.getElementById('city');
-
-        provinceSelect.addEventListener('change', function() {
-            const cities = provinceCities[this.value] || [];
-            citySelect.innerHTML = '<option value="" disabled selected>City</option>';
-            cities.forEach(city => {
-                const option = document.createElement('option');
-                option.value = city;
-                option.textContent = city;
-                citySelect.appendChild(option);
-            });
-        });
-    </script>
+                <button type="submit">Find Prices</button>
+            </div>
+        </form>
+    </div>
 
     <!-- Error Message -->
     <div th:if="${error}" class="error" th:text="${error}"></div>
 
-    <!-- Toast container -->
-    <div id="toast"
-         style="display:none; margin:10px auto; padding:15px 20px; background:#ff9800; color:#fff; border-radius:8px; text-align:center; max-width:400px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.5); opacity:0; transition: opacity 0.5s;">
-        No Product Found in this location, try some other locations !
-    </div>
+    <!-- Toast -->
+    <div id="toast">No Product Found in this location, try some other locations!</div>
 
     <!-- Store Results -->
-    <div th:if="${#lists.isEmpty(stores)}"></div>
     <div th:each="store : ${stores}" class="store-card" th:data-availability="${store.availability}">
         <div class="card-header">
-            <!-- Left side -->
             <div class="left-info">
                 <h3 th:text="${store.productName}">Product Name</h3>
                 <p><strong>Store:</strong> <span th:text="${store.storeName}">Store Name</span>
                     (<span th:text="${store.storeType}">Type</span>)</p>
-                <p>
-                    <strong>Availability:</strong>
+                <p><strong>Availability:</strong>
                     <span class="availability"
                           th:classappend="${store.availability == 'In Stock'} ? ' in-stock' :
-                                      (${store.availability == 'Low Stock'} ? ' low-stock' : ' out-of-stock')"
+                                          (${store.availability == 'Low Stock'} ? ' low-stock' : ' out-of-stock')"
                           th:text="${store.availability}">
-                </span>
+                    </span>
                 </p>
                 <p><strong>Distance:</strong> <span th:text="${store.distance}">0</span></p>
                 <p><strong>Address:</strong> <span th:text="${store.location}">Address</span></p>
                 <p><strong>Last Updated:</strong> <span th:text="${store.lastUpdated}">Today</span></p>
                 <p><strong>Website:</strong> <a th:href="${store.website}" target="_blank">Visit Store</a></p>
             </div>
-
-            <!-- Right side -->
             <div class="right-info">
                 <p class="price">💲 $<span th:text="${store.price}">0.00</span></p>
                 <p class="discount">🎯 <span th:text="${store.discount}">0%</span></p>
@@ -271,21 +262,53 @@
             </div>
         </div>
     </div>
-
-
-    <script th:if="${noData}">
-        const toast = document.getElementById('toast');
-        toast.style.display = 'block';
-        setTimeout(() => {
-            toast.style.opacity = 1; // fade in
-        }, 100);
-
-        setTimeout(() => {
-            toast.style.opacity = 0; // fade out
-            setTimeout(() => { toast.style.display = 'none'; }, 500); // hide after fade-out
-        }, 5000); // visible for 5 seconds
-    </script>
-    </div>
 </div>
+
+<script>
+    const provinceCities = {
+        "AB": ["Calgary", "Edmonton", "Red Deer", "Lethbridge", "Fort McMurray", "Medicine Hat", "Grande Prairie"],
+        "BC": ["Vancouver", "Victoria", "Kelowna", "Surrey", "Burnaby", "Richmond", "Abbotsford", "Nanaimo"],
+        "MB": ["Winnipeg", "Brandon", "Steinbach", "Thompson", "Portage la Prairie", "Selkirk"],
+        "NB": ["Moncton", "Fredericton", "Saint John", "Dieppe", "Miramichi", "Bathurst"],
+        "NL": ["St. John's", "Mount Pearl", "Corner Brook", "Gander", "Grand Falls-Windsor", "Clarenville"],
+        "NS": ["Halifax", "Sydney", "Dartmouth", "Truro", "New Glasgow", "Glace Bay"],
+        "ON": ["Toronto", "Ottawa", "Hamilton", "London", "Mississauga", "Brampton", "Kitchener", "Windsor", "Thunder Bay"],
+        "PE": ["Charlottetown", "Summerside", "Stratford", "Cornwall", "Montague"],
+        "QC": ["Montreal", "Quebec City", "Laval", "Gatineau", "Longueuil", "Sherbrooke", "Trois-Rivières", "Lévis"],
+        "SK": ["Saskatoon", "Regina", "Prince Albert", "Moose Jaw", "Yorkton", "Swift Current"],
+        "NT": ["Yellowknife", "Hay River", "Fort Smith", "Inuvik"],
+        "NU": ["Iqaluit", "Rankin Inlet", "Arviat", "Cambridge Bay"],
+        "YT": ["Whitehorse", "Dawson City", "Watson Lake"]
+    };
+
+    const provinceSelect = document.getElementById('province');
+    const citySelect = document.getElementById('city');
+
+    provinceSelect.addEventListener('change', function() {
+        const cities = provinceCities[this.value] || [];
+        citySelect.innerHTML = '<option value="" disabled selected>City</option>';
+        cities.forEach(city => {
+            const option = document.createElement('option');
+            option.value = city;
+            option.textContent = city;
+            citySelect.appendChild(option);
+        });
+    });
+
+    // Toast display
+    /*[[${noData}]]*/
+    document.addEventListener("DOMContentLoaded", function(){
+        if(/*[[${noData}]]*/ false){
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.opacity = 1; }, 100);
+            setTimeout(() => {
+                toast.style.opacity = 0;
+                setTimeout(() => { toast.style.display = 'none'; }, 500);
+            }, 5000);
+        }
+    });
+</script>
+
 </body>
 </html>
