@@ -1,14 +1,27 @@
-# Use a Java 17 base image
-FROM eclipse-temurin:17-jdk-alpine
-
-# Set working directory
+#
+# Build stage
+#
+FROM maven:3.9.2-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copy the jar built by Maven/Gradle
-COPY target/product-price-comparison-0.0.1-SNAPSHOT.jar app.jar
+# Copy Maven project files
+COPY pom.xml .
+COPY src ./src
 
-# Expose port
+# Build the Spring Boot JAR
+RUN mvn clean package -DskipTests
+
+#
+# Package stage
+#
+FROM eclipse-temurin:17-jdk-jammy AS runtime
+WORKDIR /app
+
+# Copy the JAR from build stage
+COPY --from=build /app/target/product-price-comparison-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose port (Render or any cloud service uses $PORT)
 EXPOSE 8080
 
-# Set entry point
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+# Run the Spring Boot application
+ENTRYPOINT ["java", "-jar", "app.jar"]
