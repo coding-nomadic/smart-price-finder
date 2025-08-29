@@ -100,18 +100,18 @@
         }
 
         .results-container {
-    width: 100%;
-    margin-top: 15px; /* smaller gap from form */
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* spacing between cards */
-}
+        width: 100%;
+        margin-top: 10px; /* smaller gap from form */
+        display: flex;
+        flex-direction: column;
+        gap: 15px; /* spacing between cards */
+        }
 
-@media (max-width: 768px) {
-    .results-container {
-        margin-top: 10px; /* even smaller gap on mobile */
-    }
-}
+        @media (max-width: 768px) {
+        .results-container {
+        margin-top: 5px; /* even smaller gap on mobile */
+        }
+        }
 
         .store-card {
             background: #1e1e1e;
@@ -285,34 +285,34 @@
 
 <script>
     const provinceCities = {
-        "AB":["Calgary","Edmonton","Red Deer","Lethbridge","Fort McMurray","Medicine Hat","Grande Prairie"],
-        "BC":["Vancouver","Victoria","Kelowna","Surrey","Burnaby","Richmond","Abbotsford","Nanaimo"],
-        "MB":["Winnipeg","Brandon","Steinbach","Thompson","Portage la Prairie","Selkirk"],
-        "NB":["Moncton","Fredericton","Saint John","Dieppe","Miramichi","Bathurst"],
-        "NL":["St. John's","Mount Pearl","Corner Brook","Gander","Grand Falls-Windsor","Clarenville"],
-        "NS":["Halifax","Sydney","Dartmouth","Truro","New Glasgow","Glace Bay"],
-        "ON":["Toronto","Ottawa","Hamilton","London","Mississauga","Brampton","Kitchener","Windsor","Thunder Bay"],
-        "PE":["Charlottetown","Summerside","Stratford","Cornwall","Montague"],
-        "QC":["Montreal","Quebec City","Laval","Gatineau","Longueuil","Sherbrooke","Trois-Rivières","Lévis"],
-        "SK":["Saskatoon","Regina","Prince Albert","Moose Jaw","Yorkton","Swift Current"],
-        "NT":["Yellowknife","Hay River","Fort Smith","Inuvik"],
-        "NU":["Iqaluit","Rankin Inlet","Arviat","Cambridge Bay"],
-        "YT":["Whitehorse","Dawson City","Watson Lake"]
-    };
+     "AB": ["Calgary","Edmonton","Red Deer","Lethbridge","Fort McMurray","Medicine Hat","Grande Prairie","Spruce Grove","Airdrie","St. Albert","Lloydminster","Camrose"],
+     "BC": ["Vancouver","Victoria","Kelowna","Surrey","Burnaby","Richmond","Abbotsford","Nanaimo","Kamloops","Coquitlam","Langley","Delta","North Vancouver","West Vancouver"],
+     "MB": ["Winnipeg","Brandon","Steinbach","Thompson","Portage la Prairie","Selkirk","Morden","Winkler","Dauphin","Flin Flon"],
+     "NB": ["Moncton","Fredericton","Saint John","Dieppe","Miramichi","Bathurst","Riverview","Edmundston","Campbellton","Oromocto"],
+     "NL": ["St. John's","Mount Pearl","Corner Brook","Gander","Grand Falls-Windsor","Clarenville","Conception Bay South","Paradise","Bay Roberts","Carbonear"],
+     "NS": ["Halifax","Sydney","Dartmouth","Truro","New Glasgow","Glace Bay","Sydney Mines","Kentville","Bridgewater","Yarmouth"],
+     "ON": ["Toronto","Ottawa","Hamilton","London","Mississauga","Brampton","Kitchener","Windsor","Thunder Bay","Waterloo","Markham","Vaughan","Richmond Hill","Burlington","Oakville","Niagara Falls","Guelph","Barrie","St. Catharines"],
+     "PE": ["Charlottetown","Summerside","Stratford","Cornwall","Montague","Souris","Georgetown","Borden-Carleton"],
+     "QC": ["Montreal","Quebec City","Laval","Gatineau","Longueuil","Sherbrooke","Trois-Rivières","Lévis","Blainville","Brossard","Saint-Jean-sur-Richelieu","Repentigny","Drummondville","Saint-Jérôme"],
+     "SK": ["Saskatoon","Regina","Prince Albert","Moose Jaw","Yorkton","Swift Current","North Battleford","Estevan","Weyburn","Lloydminster"],
+     "NT": ["Yellowknife","Hay River","Fort Smith","Inuvik","Behchoko","Norman Wells"],
+     "NU": ["Iqaluit","Rankin Inlet","Arviat","Cambridge Bay","Pangnirtung","Igloolik","Baker Lake"],
+     "YT": ["Whitehorse","Dawson City","Watson Lake","Haines Junction","Carmacks","Burwash Landing"]
+ };
 
-    const provinceSelect = document.getElementById('province');
-    const citySelect = document.getElementById('city');
+     const provinceSelect = document.getElementById('province');
+     const citySelect = document.getElementById('city');
 
-    provinceSelect.addEventListener('change', function() {
-        const cities = provinceCities[this.value] || [];
-        citySelect.innerHTML = '<option value="" disabled selected>City</option>';
-        cities.forEach(city => {
-            const option = document.createElement('option');
-            option.value = city;
-            option.textContent = city;
-            citySelect.appendChild(option);
-        });
-    });
+     provinceSelect.addEventListener('change', function() {
+         const cities = provinceCities[this.value] || [];
+         citySelect.innerHTML = '<option value="" disabled selected>City</option>';
+         cities.forEach(city => {
+             const option = document.createElement('option');
+             option.value = city;
+             option.textContent = city;
+             citySelect.appendChild(option);
+         });
+     });
 </script>
 </body>
 </html>
