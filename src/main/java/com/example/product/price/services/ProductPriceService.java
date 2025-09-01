@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 @Service
 public class ProductPriceService {
 
@@ -43,21 +44,17 @@ public class ProductPriceService {
     }
 
     @Cacheable(value = "stores", key = "#query + '-' + #city + '-' + #province")
-    public List<ProductPriceDetail> fetchStores(String query, String city, String province) {
+    public CompletableFuture<List<ProductPriceDetail>> fetchStores(String query, String city, String province) {
         final String prompt = ProductPriceUtils.setPrompt(query, city, province);
 
-        try {
-            return CompletableFuture.supplyAsync(() -> {
-                try {
-                    return sendRequestAndParse(prompt);
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }, virtualThreadExecutor).join();
-        } catch (Exception e) {
-            logger.error("Error fetching stores for prompt '{}'", prompt, e);
-            return List.of();
-        }
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return sendRequestAndParse(prompt);
+            } catch (IOException | InterruptedException e) {
+                logger.error("Error fetching stores for prompt '{}'", prompt, e);
+                return List.of();
+            }
+        }, virtualThreadExecutor);
     }
 
     private List<ProductPriceDetail> sendRequestAndParse(String prompt) throws IOException, InterruptedException {
@@ -85,6 +82,7 @@ public class ProductPriceService {
 
         logger.info("Running fetchStores on thread: {}, isVirtual: {}",
                 Thread.currentThread().getName(), Thread.currentThread().isVirtual());
+
         return httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
     }
 
