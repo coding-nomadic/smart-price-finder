@@ -11,7 +11,7 @@ Welcome to Smart Price Finder, your go-to platform for discovering products at n
 - Access continuous updates with more stores and products.
 
 ## Tools and Technologies
-- Java 17
+- Java 21
 - Spring Boot
 - Spring Web MVC
 - Virtual Threads
