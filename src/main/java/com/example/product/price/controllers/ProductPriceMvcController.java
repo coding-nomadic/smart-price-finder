@@ -5,7 +5,6 @@ import com.example.product.price.models.ProductPriceDetail;
 import com.example.product.price.services.EmailService;
 import com.example.product.price.services.ProductPriceService;
 import com.example.product.price.utils.JsonUtils;
-import com.example.product.price.utils.ProductPriceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -16,15 +15,15 @@ import java.util.Collections;
 import java.util.List;
 
 @Controller
-public class ProductPriceController {
+public class ProductPriceMvcController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductPriceController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProductPriceMvcController.class);
 
     private final ProductPriceService productPriceService;
     private final EmailService emailService;
 
 
-    public ProductPriceController(final ProductPriceService productPriceService, EmailService emailService) {
+    public ProductPriceMvcController(final ProductPriceService productPriceService, EmailService emailService) {
         this.productPriceService = productPriceService;
         this.emailService = emailService;
     }
