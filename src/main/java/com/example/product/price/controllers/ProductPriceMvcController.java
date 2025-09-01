@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Controller
 public class ProductPriceMvcController {
@@ -22,8 +23,7 @@ public class ProductPriceMvcController {
     private final ProductPriceService productPriceService;
     private final EmailService emailService;
 
-
-    public ProductPriceMvcController(final ProductPriceService productPriceService, EmailService emailService) {
+    public ProductPriceMvcController(ProductPriceService productPriceService, EmailService emailService) {
         this.productPriceService = productPriceService;
         this.emailService = emailService;
     }
@@ -34,22 +34,29 @@ public class ProductPriceMvcController {
     }
 
     @PostMapping("/generate")
-    public String fetchProductPriceLists(@RequestParam String query, @RequestParam String province, @RequestParam String city, Model model) {
-        try {
-            logger.info("Query: " + query + ", Province: " + province + ", City: " + city);
-            final List<ProductPriceDetail> stores = productPriceService.fetchStores(query, city, province);
-            logger.info("Fetched {} stores for query '{}'", stores.size(), JsonUtils.toString(stores));
-            model.addAttribute("query", query);
-            model.addAttribute("stores", stores);
-            if (stores.isEmpty()) {
-                model.addAttribute("noData", "No Product Found in this location, try some other locations !");
-            }
-        } catch (Exception exception) {
-            logger.error("Error fetching stores for query '{}'", query, exception);
-            model.addAttribute("error", "Unable to fetch stores. Please try again later!");
-            model.addAttribute("stores", Collections.emptyList());
-        }
-        return "home";
+    public CompletableFuture<String> fetchProductPriceLists(@RequestParam String query,
+                                                            @RequestParam String province,
+                                                            @RequestParam String city,
+                                                            Model model) {
+        logger.info("Query: {}, Province: {}, City: {}", query, province, city);
+
+        // Call the service asynchronously
+        return productPriceService.fetchStores(query, city, province)
+                .thenApply(stores -> {
+                    logger.info("Fetched {} stores for query '{}'", stores.size(), query);
+                    model.addAttribute("query", query);
+                    model.addAttribute("stores", stores);
+                    if (stores.isEmpty()) {
+                        model.addAttribute("noData", "No Product Found in this location, try some other locations!");
+                    }
+                    return "home";
+                })
+                .exceptionally(ex -> {
+                    logger.error("Error fetching stores for query '{}'", query, ex);
+                    model.addAttribute("error", "Unable to fetch stores. Please try again later!");
+                    model.addAttribute("stores", Collections.emptyList());
+                    return "home";
+                });
     }
 
     @GetMapping("/about")
@@ -63,13 +70,21 @@ public class ProductPriceMvcController {
     }
 
     @PostMapping("/contact-submit")
-    public String submitContactForm(ContactForm form, Model model) {
-        try {
-            emailService.sendContactEmail(form);
-            model.addAttribute("success", "Message sent successfully!");
-        } catch (Exception e) {
-            model.addAttribute("error", "Failed to send message. Please try again later.");
-        }
-        return "contact";
+    public CompletableFuture<String> submitContactForm(ContactForm form, Model model) {
+        return CompletableFuture.runAsync(() -> {
+                    try {
+                        emailService.sendContactEmail(form);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .thenApply(unused -> {
+                    model.addAttribute("success", "Message sent successfully!");
+                    return "contact";
+                })
+                .exceptionally(ex -> {
+                    model.addAttribute("error", "Failed to send message. Please try again later.");
+                    return "contact";
+                });
     }
 }
