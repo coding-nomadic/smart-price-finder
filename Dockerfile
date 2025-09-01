@@ -14,7 +14,7 @@ RUN mvn clean install -DskipTests
 #
 # Package stage
 #
-FROM eclipse-temurin:17-jdk-jammy AS runtime
+FROM eclipse-temurin:21-jdk-jammy AS runtime
 WORKDIR /app
 
 # Copy the JAR from build stage
