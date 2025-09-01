@@ -1,6 +1,7 @@
 package com.example.product.price.services;
 
 import com.example.product.price.models.ProductPriceDetail;
+import com.example.product.price.utils.ProductPriceUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +19,9 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 @Service
 public class ProductPriceService {
 
@@ -26,46 +29,52 @@ public class ProductPriceService {
     private final String apiUrl;
     private final String apiKey;
     private final HttpClient httpClient;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
     public ProductPriceService(@Value("${gemini.api.url}") final String apiUrl,
                                @Value("${gemini.api.key}") final String apiKey) {
         this.apiUrl = apiUrl;
         this.apiKey = apiKey;
-        this.httpClient = HttpClient.newHttpClient();
-        this.objectMapper = new ObjectMapper();
+        this.httpClient = HttpClient.newBuilder()
+                .executor(virtualThreadExecutor)
+                .build();
     }
 
-    /**
-     * Fetches product store details from the API using the given prompt.
-     */
-    @Cacheable(value = "stores", key = "#prompt")
-    public List<ProductPriceDetail> fetchStores(final String prompt) {
+    @Cacheable(value = "stores", key = "#query + '-' + #city + '-' + #province")
+    public List<ProductPriceDetail> fetchStores(String query, String city, String province) {
+        final String prompt = ProductPriceUtils.setPrompt(query, city, province);
+
         try {
-            final String responseBody = sendRequest(prompt);
-            final String jsonArrayText = extractJsonArray(responseBody);
-            return parseStores(jsonArrayText);
-        } catch (IOException | InterruptedException e) {
+            return CompletableFuture.supplyAsync(() -> {
+                try {
+                    return sendRequestAndParse(prompt);
+                } catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }, virtualThreadExecutor).join();
+        } catch (Exception e) {
             logger.error("Error fetching stores for prompt '{}'", prompt, e);
-            return List.of(); // Return empty list on error
+            return List.of();
         }
     }
 
-    /**
-     * Sends the HTTP POST request to the API with the given prompt.
-     */
-    private String sendRequest(final String prompt) throws IOException, InterruptedException {
-        final Map<String, Object> part = Map.of("text", prompt);
-        final Map<String, Object> content = Map.of("role", "user", "parts", List.of(part));
-        final Map<String, Object> body = Map.of("contents", List.of(content));
+    private List<ProductPriceDetail> sendRequestAndParse(String prompt) throws IOException, InterruptedException {
+        final String responseBody = sendRequest(prompt);
+        final String jsonArrayText = extractJsonArray(responseBody);
+        return parseStores(jsonArrayText);
+    }
 
-        final String requestBody;
-        try {
-            requestBody = objectMapper.writeValueAsString(body);
-        } catch (JsonProcessingException e) {
-            logger.error("Error serializing request body for prompt '{}'", prompt, e);
-            throw new RuntimeException("Failed to serialize request body", e);
-        }
+    private String sendRequest(String prompt) throws IOException, InterruptedException {
+        final Map<String, Object> body = Map.of(
+                "contents", List.of(Map.of(
+                        "role", "user",
+                        "parts", List.of(Map.of("text", prompt))
+                ))
+        );
+
+        final String requestBody = objectMapper.writeValueAsString(body);
 
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(apiUrl))
@@ -74,53 +83,39 @@ public class ProductPriceService {
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
-        final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        return response.body();
+        logger.info("Running fetchStores on thread: {}, isVirtual: {}",
+                Thread.currentThread().getName(), Thread.currentThread().isVirtual());
+        return httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
     }
 
-    /**
-     * Extracts the raw JSON array text from the API response.
-     */
     private String extractJsonArray(final String responseBody) throws JsonProcessingException {
         final JsonNode rootNode = objectMapper.readTree(responseBody);
-        final String rawText = rootNode
-                .path("candidates")
+        final String rawText = rootNode.path("candidates")
                 .get(0)
                 .path("content")
                 .path("parts")
                 .get(0)
                 .path("text")
                 .asText();
-
-        // Remove triple backticks if present
         return rawText.replaceAll("^```json\\s*", "").replaceAll("\\s*```$", "");
     }
 
-    /**
-     * Parses JSON array text into a list of ProductPriceDetail objects.
-     */
     private List<ProductPriceDetail> parseStores(final String jsonArrayText) {
         final List<ProductPriceDetail> stores = new ArrayList<>();
-
-        // Quick check if it looks like JSON array
         if (jsonArrayText == null || !jsonArrayText.trim().startsWith("[")) {
             logger.warn("Response is not a JSON array: {}", jsonArrayText);
-            return stores; // return empty list
+            return stores;
         }
-
         try {
             final JsonNode jsonArray = objectMapper.readTree(jsonArrayText);
             if (jsonArray.isArray()) {
                 for (final JsonNode node : jsonArray) {
                     stores.add(objectMapper.treeToValue(node, ProductPriceDetail.class));
                 }
-            } else {
-                logger.warn("Expected JSON array but received: {}", jsonArrayText);
             }
         } catch (JsonProcessingException e) {
             logger.error("Failed to parse JSON array: {}", jsonArrayText, e);
         }
-
         return stores;
     }
 }
