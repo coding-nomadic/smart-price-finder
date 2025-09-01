@@ -1,8 +1,13 @@
 #
 # Build stage
 #
-FROM maven:3.9.2-jdk-21 AS build
+FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
+
+# Install Maven manually (since official Eclipse Temurin image doesn’t include Maven)
+RUN apt-get update && \
+    apt-get install -y maven && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy Maven project files
 COPY pom.xml .
