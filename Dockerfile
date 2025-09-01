@@ -1,27 +1,16 @@
+
 #
 # Build stage
 #
-FROM maven:3.9.2-eclipse-temurin-21 AS build
-WORKDIR /app
-
-# Copy Maven project files
-COPY pom.xml .
-COPY src ./src
-
-# Build the Spring Boot JAR
+FROM maven:3.8.2-jdk-21 AS build
+COPY . .
 RUN mvn clean package -DskipTests
 
 #
-# Runtime stage
+# Package stage
 #
-FROM eclipse-temurin:21-jdk-jammy AS runtime
-WORKDIR /app
-
-# Copy the JAR from the build stage
+FROM openjdk:11-jdk-slim
 COPY --from=build /app/target/product-price-comparison-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose port for the application
+# ENV PORT=8080
 EXPOSE 8080
-
-# Run the Spring Boot application
 ENTRYPOINT ["java", "-jar", "app.jar"]
