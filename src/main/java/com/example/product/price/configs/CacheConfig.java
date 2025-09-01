@@ -15,9 +15,9 @@ public class CacheConfig {
                 .maximumSize(2000);
     }
     @Bean
-    public CacheManager cacheManager(Caffeine<Object, Object> caffeine) {
+    public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager("stores");
-        cacheManager.setCaffeine(caffeine);
+        cacheManager.setAsyncCacheMode(true); 
         return cacheManager;
     }
 }
