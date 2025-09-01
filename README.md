@@ -14,6 +14,7 @@ Welcome to Smart Price Finder, your go-to platform for discovering products at n
 - Java 17
 - Spring Boot
 - Spring Web MVC
+- Virtual Threads
 - ThyLeaf
 - Gemini LLM Model
 - Prompt Engieering
