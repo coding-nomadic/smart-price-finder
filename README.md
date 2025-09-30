@@ -15,9 +15,9 @@ Welcome to Smart Price Finder, your go-to platform for discovering products at n
 - Spring Boot
 - Spring Web MVC
 - Virtual Threads
-- ThyLeaf
+- ThymeLeaf
 - Gemini LLM Model
-- Prompt Engieering
+- Prompt Engineering
 - Docker
 - Render
 
